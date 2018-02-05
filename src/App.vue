@@ -19,18 +19,18 @@ import modal from './components/modal.vue'
 
 export default {
     name: 'App',
-        components: { modal },
-        data () {
-            return {
-                openModal: false,
-            }
-        },
-        methods:{
-            sendData(value){
-                console.info(value);
-                this.openModal = false;
-            }
+    components: { modal },
+    data () {
+        return {
+            openModal: false,
         }
+    },
+    methods:{
+        sendData(value){
+            console.info(value);
+            this.openModal = false;
+        }
+    }
 }
 </script>
 
