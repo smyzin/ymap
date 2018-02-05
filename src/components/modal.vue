@@ -78,7 +78,8 @@
                     </div>
                 </div>
                 <div class="mBlock__col6">
-                    <div class="mBlock__radio" style="margin-bottom: 10px;">
+                    <div class="mBlock__radio">
+                        <!--style="margin-bottom: 10px;"-->
                         <p class="mBlock__label">Назначение: </p>
 
                         <label class="mBlock__label_radio custom__radio" for="mBlock__radio__purpose_living">
@@ -402,15 +403,13 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&subset=cyrillic');
 
-
 /* Customize the label (the container) */
 .custom__radio {
     display: block;
     position: relative;
-    padding-left: 35px;
+    padding-left: 30px;
     margin-bottom: 12px;
     cursor: pointer;
-    /*font-size: 22px;*/
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -426,34 +425,23 @@ export default {
 /* Create a custom radio button */
 .custom__checkmark {
     position: absolute;
-    top: 0;
+    top: 3px;
     left: 0;
     height: 14px;
     width: 14px;
-    background-color: #eee;
+    background-color: #DEDEDE;
     border-radius: 50%;
 }
 
-/* On mouse-over, add a grey background color */
-.custom__input:hover ~ .custom__checkmark {
-    background-color: #ccc;
-}
-
-/* When the radio button is checked, add a blue background */
-.custom__input:checked ~ .custom__checkmark {
-    background-color: #4EB645;
-}
+.custom__input:hover ~ .custom__checkmark { background-color: #ccc; }
+.custom__input:checked ~ .custom__checkmark { background-color: #4EB645; }
+.custom__input:checked ~ .custom__checkmark:after { display: block; }
 
 /* Create the indicator (the dot/circle - hidden when not checked) */
 .custom__checkmark:after {
     content: "";
     position: absolute;
     display: none;
-}
-
-/* Show the indicator (dot/circle) when checked */
-.custom__input:checked ~ .custom__checkmark:after {
-    display: block;
 }
 
 /* Style the indicator (dot/circle) */
@@ -534,30 +522,31 @@ export default {
 
     .modal__button{
         /*background: aqua;*/
-        color: #FF8C00;
-        border: 2px solid #FF8C00;
+        color: #4EB645;
+        border: 2px solid #4EB645;
         -webkit-border-radius: 7px;
         -moz-border-radius: 7px;
         border-radius: 7px;
-        padding: 15px 20px;
+        padding: 10px 15px;
         margin: 7px 10px;
-        font-size: 17px;
+        font-size: 16px;
+        font-weight: 600;
         transition: all .3s ease-in-out;
     }
     .modal__button:hover{
-        background: #FF8C00;
+        background: #4EB645;
         color: #fff;
     }
     .modal__button_disabled{
         cursor: no-drop;
         background: #EDEDED;
-        color: #CD7100;
-        border-color: #CD7100;
+        color: #4EB645;
+        border-color: #4EB645;
     }
     .modal__button_disabled:hover{
         background: #EDEDED;
-        color: #CD7100;
-        border-color: #CD7100;
+        color: #4EB645;
+        border-color: #4EB645;
     }
     .modal__block{
         display: block;
