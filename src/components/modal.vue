@@ -106,32 +106,36 @@
                         'mBlock__input_good': state.address.okey,
                         'mBlock__input_error': state.address.error
                     }" v-model="address" placeholder="Например: Старопетровский пр., вл. 10, стр. 1">
+
                     <label class="mBlock__label" for="mBlock__input__area">Округ</label>
                     <input type="text" id="mBlock__input__area" :class="{
                         'mBlock__input': true,
                         'mBlock__input_good': state.area.okey,
                         'mBlock__input_error': state.area.error
                     }" v-model="area" placeholder="Например: САО">
+
                     <label class="mBlock__label" for="mBlock__input__district">Район</label>
                     <input type="text" id="mBlock__input__district" :class="{
                         'mBlock__input': true,
                         'mBlock__input_good': state.district.okey,
                         'mBlock__input_error': state.district.error
                     }" v-model="district" placeholder="Например: Войковский">
+
                     <label class="mBlock__label" for="mBlock__input__square">Площадь (кв.м)</label>
                     <input type="text" id="mBlock__input__square" :class="{
                         'mBlock__input': true,
                         'mBlock__input_good': state.square.okey,
                         'mBlock__input_error': state.square.error
-                    }" v-model="square" placeholder="Например: 1400 ㎡">
+                    }" v-model="square" placeholder="Например: 1400 ㎡" @keypress="addSymbol($event, $event.target, '㎡')">
+
                     <label class="mBlock__label" for="mBlock__input__cadastral_number">Кадастравый номер</label>
-                    <!--77:09:0003016:211-->
                     <masked id="mBlock__input__cadastral_number" mask="11:11:1111111:111" placeholder="Например: 00:00:0000000:000"
                         :class="{
                             'mBlock__input': true,
                             'mBlock__input_good': state.cadastral_number.okey,
                             'mBlock__input_error': state.cadastral_number.error
                         }" v-model="cadastral_number" />
+
                     <label class="mBlock__label" for="mBlock__input__exploitation_permission">Вид разрешенного использования</label>
                     <input type="text" id="mBlock__input__exploitation_permission" :class="{
                         'mBlock__input': true,
@@ -148,13 +152,15 @@
                             'mBlock__input_good': state.rights_type.okey,
                             'mBlock__input_error': state.rights_type.error
                         }" v-model="rights_type" placeholder="Например: собственность">
+
                     <label class="mBlock__label" for="mBlock__input__surface_square">Наземная площадь</label>
                     <input type="text" id="mBlock__input__surface_square"
                         :class="{
                             'mBlock__input': true,
                             'mBlock__input_good': state.surface_square.okey,
                             'mBlock__input_error': state.surface_square.error
-                        }" v-model="surface_square" placeholder="Например: 6935 ㎡">
+                        }" v-model="surface_square" placeholder="Например: 6935 ㎡" @keypress="addSymbol($event, $event.target, '㎡')">
+
                     <label class="mBlock__label" for="mBlock__input__building_density">Плотность застройки</label>
                     <input type="text" id="mBlock__input__building_density"
                         :class="{
@@ -162,6 +168,7 @@
                             'mBlock__input_good': state.building_density.okey,
                             'mBlock__input_error': state.building_density.error
                         }" v-model="building_density" placeholder="Например: 50">
+
                     <label class="mBlock__label" for="mBlock__input__effective_square_index">Коэфициент для рассчёта полезной площади</label>
                     <input type="text" id="mBlock__input__effective_square_index"
                         :class="{
@@ -169,21 +176,22 @@
                             'mBlock__input_good': state.effective_square_index.okey,
                             'mBlock__input_error': state.effective_square_index.error
                         }" v-model="effective_square_index" placeholder="Например: 0.70">
+
                     <label class="mBlock__label" for="mBlock__input__effective_square">Полезная/продаваемая площадь</label>
                     <input type="text" id="mBlock__input__effective_square"
                         :class="{
                             'mBlock__input': true,
                             'mBlock__input_good': state.effective_square.okey,
                             'mBlock__input_error': state.effective_square.error
-                        }" v-model="effective_square" placeholder="Например: 4855 ㎡" >
-                    <!--:keypress="addSymbol(event, this, '㎡')"-->
+                        }" v-model="effective_square" placeholder="Например: 4855 ㎡" @keypress="addSymbol($event, $event.target, '㎡')">
+
                     <label class="mBlock__label" for="mBlock__input__price">Стоимость</label>
                     <input type="text" id="mBlock__input__price"
                         :class="{
                             'mBlock__input': true,
                             'mBlock__input_good': state.price.okey,
                             'mBlock__input_error': state.price.error
-                        }" v-model="price" placeholder="Например: 10 000 000 ₽">
+                        }" v-model="price" placeholder="Например: 10 000 000 ₽" @keypress="addSymbol($event, $event.target, '₽')">
                 </div>
 
                 <button class="modal__button" @click="saveData">
@@ -197,16 +205,6 @@
 <script>
 // import lodash from 'lodash'
 import masked from 'vue-masked-input'
-
-// test.onkeypress = event => {
-//     // Control buttons
-//     if (event.key.length > 1) return true;
-//     test.value = (test.value+event.key)
-//             .replace(/\D/g, '')
-//             .replace(/(\d)(?=(\d{3})+([^\d]|$))/g, '$1 ')
-//         +'₽';
-//     event.preventDefault();
-// }
 
 export default {
     name: 'Modal',
@@ -224,7 +222,6 @@ export default {
         },
         async square(){
             await this.validate(this.square, 'square', 1);
-            // document.getElementById('mBlock__input__square').value = this.square + '㎡';
         },
         async cadastral_number(){
             if(this.cadastral_number.slice(-1) !== '_' && this.cadastral_number !== ''){
@@ -336,14 +333,12 @@ export default {
     },
     methods:{
         addSymbol(event, target = null, symbol = null){
-            console.log(event);
-            console.log(this);
-            // if(event.value.length > 1) return true;
-            // target.value = (target.value+event.key)
-            //         .replace(/\D/g, '')
-            //         .replace(/(\d)(?=(\d{3})+([^\d]|$))/g, '$1 ')
-            //     +symbol;
-            // event.preventDefault();
+            if(event.key.length > 1) return true;
+            target.value = (target.value+event.key)
+                    .replace(/\D/g, '')
+                    .replace(/(\d)(?=(\d{3})+([^\d]|$))/g, '$1 ')
+                + ' ' + symbol;
+            event.preventDefault();
         },
         validate(value, name, min = 3){
             let regExp = /\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;/g,
