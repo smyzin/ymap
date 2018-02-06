@@ -221,8 +221,8 @@
                     :disabled="activeMap"
                     @click="saveData"
                 >
-                    Сохранить
                     <i class="mdi mdi-content-save"></i>
+                    Сохранить
                 </button>
             </div>
         </div>
@@ -384,11 +384,28 @@ export default {
             polygonCoordinates: null,
         }
     },
-    async mounted(){
-        let polygon, polygonData, placemark;
+    async created(){
+        console.info('Creating ...');
+        await this.setData().then((res)=>{
+            /* CHECK ON EMPTY VALUE */
+            for(let item in res){
+                if(item === 'placeMark' || item === 'newPolygon' || item === 'polygonCoordinates'){continue;}
+                else{
+                    if(!res[item]){
+                        this.state[item].error = true;
+                    }else{
+                        this.state[item].okey = true;
+                    }
+                }
+            }
+        }).then(()=>{
 
-        polygonData = this.reverseArr(this.newPolygon);
-        polygon = polygonData.toString().replace(/\s|\[|\]/g,"");
+        });
+    },
+    async mounted(){
+        let polygon, placemark;
+
+        polygon = this.reverseArr(this.newPolygon).toString().replace(/\s|\[|\]/g,"");
 
         if(this.placeMark !== null){
             placemark = this.placeMark.reverse();
@@ -396,23 +413,6 @@ export default {
         }else{
             document.getElementById('map').style.backgroundImage = `url('https://static-maps.yandex.ru/1.x/?size=650,250&z=16&l=map&pl=c:757979C0,f:86C678A0,w:2,${polygon}')`;
         }
-
-        await this.setData();
-
-        /* CHECK ON EMPTY VALUE */
-        for(let item in this.fields){
-           if(item === 'placeMark' || item === 'newPolygon' || item === 'polygonCoordinates'){continue;}
-           else{
-                if(!this.fields[item]){
-                    this.state[item].error = true;
-                }else{
-                    this.state[item].okey = true;
-                }
-            }
-        }
-    },
-    created(){
-        console.info('Created...');
     },
     methods:{
         /* FIELDS METHODS */
@@ -694,29 +694,45 @@ export default {
         /* FUCKING MAGIC - DO NOT TOUCH end */
         /* SETTING DATA */
         setData(){
-            this.fields = {
-                /* MAP */
-                placeMark: this.placeMark,
-                newPolygon: this.newPolygon,
-                polygonCoordinates: this.polygonCoordinates,
-                /* INPUTS */
-                address: this.address,
-                area: this.area,
-                district: this.district,
-                square: this.square,
-                cadastral_number: this.cadastral_number,
-                exploitation_permission: this.exploitation_permission,
-                rights_type: this.rights_type,
-                surface_square: this.surface_square,
-                building_density: this.building_density,
-                effective_square_index: this.effective_square_index,
-                effective_square: this.effective_square,
-                price: this.price,
-                /* RADIOS */
-                status: this.status,
-                city_plan: this.city_plan,
-                purpose_trading: this.purpose_trading,
-            };
+            return new Promise((resolve, reject)=>{
+                if(Number.isInteger(this.square)){
+                    this.square = this.square  + ' ㎡';
+                }
+                if(Number.isInteger(this.surface_square)){
+                    this.surface_square = this.surface_square  + ' ㎡';
+                }
+                if(Number.isInteger(this.effective_square)){
+                    this.effective_square = this.effective_square  + ' ㎡';
+                }
+                if(Number.isInteger(this.price)){
+                    this.price = this.price + ' ₽';
+                }
+
+                this.fields = {
+                    /* MAP */
+                    placeMark: this.placeMark,
+                    newPolygon: this.newPolygon,
+                    polygonCoordinates: this.polygonCoordinates,
+                    /* INPUTS */
+                    address: this.address,
+                    area: this.area,
+                    district: this.district,
+                    square: this.square,
+                    cadastral_number: this.cadastral_number,
+                    exploitation_permission: this.exploitation_permission,
+                    rights_type: this.rights_type,
+                    surface_square: this.surface_square,
+                    building_density: this.building_density,
+                    effective_square_index: this.effective_square_index,
+                    effective_square: this.effective_square,
+                    price: this.price,
+                    /* RADIOS */
+                    status: this.status,
+                    city_plan: this.city_plan,
+                    purpose_trading: this.purpose_trading,
+                };
+                resolve(this.fields);
+            });
         },
         /* SAVING DATA */
         saveData(){
@@ -725,15 +741,15 @@ export default {
                 address: this.address,
                 area: this.area,
                 district: this.district,
-                square: this.square.slice(0,-2).replace(/\s/g, ""),
+                square: this.square !== null ? this.square.slice(0,-2).replace(/\s/g, "") : this.square,
                 cadastral_number: this.cadastral_number,
                 exploitation_permission: this.exploitation_permission,
                 rights_type: this.rights_type,
-                surface_square: this.surface_square.slice(0,-2).replace(/\s/g, ""),
+                surface_square: this.surface_square !== null ? this.surface_square.slice(0,-2).replace(/\s/g, "") : this.surface_square,
                 building_density: this.building_density,
                 effective_square_index: this.effective_square_index,
-                effective_square: this.effective_square.slice(0,-2).replace(/\s/g, ""),
-                price: this.price.slice(0,-2).replace(/\s/g, ""),
+                effective_square: this.effective_square !== null ? this.effective_square.slice(0,-2).replace(/\s/g, "") : this.effective_square,
+                price: this.price !== null ? this.price.slice(0,-2).replace(/\s/g, "") : this.price,
                 /* RADIOS */
                 status: this.status,
                 city_plan: this.city_plan,
