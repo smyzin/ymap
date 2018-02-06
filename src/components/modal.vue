@@ -27,10 +27,7 @@
                 :disabled="activeMap"
             >Редактировать метку</button>
             <br/>
-            <button
-                :class="{
-                    'modal__button': true,
-                }"
+            <button class="modal__button"
                 @click="savePolygon()"
                 v-if="activeMap"
             >Сохранить</button>
@@ -39,96 +36,99 @@
 
                 <div class="mBlock__col6">
                     <div class="mBlock__radio">
-                        <p class="mBlock__label">Статус продажи: </p>
+                        <p :class="{'mBlock__label': true, 'mBlock__label_error': state.status.error, 'mBlock__label_good': state.status.okey}">Статус продажи: </p>
 
-                        <label class="mBlock__label_radio custom__radio" for="mBlock__radio__status_inSell">
-                            В продаже
-                            <input type="radio" name="status" id="mBlock__radio__status_inSell" class="mBlock__radio custom__input" value="В продаже" v-model="fields.status">
-                            <span class=" custom__checkmark"></span>
-                        </label>
-                        <label class="mBlock__label_radio custom__radio" for="mBlock__radio__status_sold">
-                            Продано
-                            <input type="radio" name="status" id="mBlock__radio__status_sold" class="mBlock__radio custom__input" value="Продано" v-model="fields.status">
-                            <span class=" custom__checkmark"></span>
-                        </label>
-                        <label class="mBlock__label_radio custom__radio" for="mBlock__radio__status_stop">
-                            Приостановленно
-                            <input type="radio" name="status" id="mBlock__radio__status_stop" class="mBlock__radio custom__input" value="Приостановленно" v-model="fields.status">
+                        <label
+                            class="mBlock__label_radio, custom__radio"
+                            v-for="(item, index) in ['В продаже', 'Продано', 'Приостановленно']"
+                            :key="index"
+                        >
+                            {{item}}
+                            <input type="radio" name="status" class="mBlock__radio custom__input" :value="item"
+                                v-model="status"
+                            >
                             <span class=" custom__checkmark"></span>
                         </label>
                     </div>
                     <div class="mBlock__radio">
-                        <p class="mBlock__label">ГПЗУ: </p>
+                        <p :class="{'mBlock__label': true, 'mBlock__label_error': state.city_plan.error, 'mBlock__label_good': state.city_plan.okey}">ГПЗУ: </p>
 
-                        <label class="mBlock__label_radio custom__radio" for="mBlock__radio__city_plan_yes">
-                            Да
-                            <input type="radio" name="city_plan" id="mBlock__radio__city_plan_yes" class="mBlock__radio custom__input" value="Да" v-model="fields.city_plan">
-                            <span class=" custom__checkmark"></span>
-                        </label>
-                        <label class="mBlock__label_radio custom__radio" for="mBlock__radio__city_plan_no">
-                            Нет
-                            <input type="radio" name="city_plan" id="mBlock__radio__city_plan_no" class="mBlock__radio custom__input" value="Нет" v-model="fields.city_plan">
-                            <span class=" custom__checkmark"></span>
-                        </label>
-                        <label class="mBlock__label_radio custom__radio" for="mBlock__radio__city_plan_soon">
-                            Скоро будет
-                            <input type="radio" name="city_plan" id="mBlock__radio__city_plan_soon" class="mBlock__radio custom__input" value="Скоро будет" v-model="fields.city_plan">
+                        <label
+                            class="mBlock__label_radio, custom__radio"
+                            v-for="(item, index) in ['Да', 'Нет', 'Скоро будет']"
+                            :key="index"
+                        >
+                            {{item}}
+                            <input type="radio" name="city_plan" class="mBlock__radio custom__input" :value="item"
+                                   v-model="city_plan"
+                            >
                             <span class=" custom__checkmark"></span>
                         </label>
                     </div>
                 </div>
                 <div class="mBlock__col6">
                     <div class="mBlock__radio">
-                        <p class="mBlock__label">Назначение: </p>
+                        <p :class="{'mBlock__label': true, 'mBlock__label_error': state.purpose_trading.error, 'mBlock__label_good': state.purpose_trading.okey}">Назначение: </p>
 
-                        <label class="mBlock__label_radio custom__radio" for="mBlock__radio__purpose_living">
-                            Жилищная
-                            <input type="radio" name="purpose" id="mBlock__radio__purpose_living" class="mBlock__radio custom__input" value="Жилищная" v-model="fields.purpose_trading">
-                            <span class=" custom__checkmark"></span>
-                        </label>
-                        <label class="mBlock__label_radio custom__radio" for="mBlock__radio__purpose_trading">
-                            Торговая
-                            <input type="radio" name="purpose" id="mBlock__radio__purpose_trading" class="mBlock__radio custom__input" value="Торговая" v-model="fields.purpose_trading">
-                            <span class=" custom__checkmark"></span>
-                        </label>
-                        <label class="mBlock__label_radio custom__radio" for="mBlock__radio__purpose_rent">
-                            Арендная
-                            <input type="radio" name="purpose" id="mBlock__radio__purpose_rent" class="mBlock__radio custom__input" value="Арендная" v-model="fields.purpose_trading">
+                        <label
+                            class="mBlock__label_radio, custom__radio"
+                            v-for="(item, index) in ['Жилищная', 'Торговая', 'Арендная']"
+                            :key="index"
+                        >
+                            {{item}}
+                            <input type="radio" name="purpose_trading" class="mBlock__radio custom__input" :value="item"
+                                   v-model="purpose_trading"
+                            >
                             <span class=" custom__checkmark"></span>
                         </label>
                     </div>
                 </div>
 
                 <div class="mBlock__col6">
-                    <label class="mBlock__label" for="mBlock__input__address">Адрес</label>
+                    <label :class="{'mBlock__label': true, 'mBlock__label_error': state.address.error, 'mBlock__label_good': state.address.okey}" for="mBlock__input__address">
+                        Адрес
+                        <i class="mdi mdi-checkbox-marked-circle-outline mBlock__checked"></i>
+                    </label>
                     <input type="text" id="mBlock__input__address" :class="{
                         'mBlock__input': true,
                         'mBlock__input_good': state.address.okey,
                         'mBlock__input_error': state.address.error
                     }" v-model="address" placeholder="Например: Старопетровский пр., вл. 10, стр. 1">
 
-                    <label class="mBlock__label" for="mBlock__input__area">Округ</label>
+                    <label :class="{'mBlock__label': true, 'mBlock__label_error': state.area.error, 'mBlock__label_good': state.area.okey}" for="mBlock__input__area">
+                        Округ
+                        <i class="mdi mdi-checkbox-marked-circle-outline mBlock__checked"></i>
+                    </label>
                     <input type="text" id="mBlock__input__area" :class="{
                         'mBlock__input': true,
                         'mBlock__input_good': state.area.okey,
                         'mBlock__input_error': state.area.error
                     }" v-model="area" placeholder="Например: САО">
 
-                    <label class="mBlock__label" for="mBlock__input__district">Район</label>
+                    <label :class="{'mBlock__label': true, 'mBlock__label_error': state.district.error, 'mBlock__label_good': state.district.okey}" for="mBlock__input__district">
+                        Район
+                        <i class="mdi mdi-checkbox-marked-circle-outline mBlock__checked"></i>
+                    </label>
                     <input type="text" id="mBlock__input__district" :class="{
                         'mBlock__input': true,
                         'mBlock__input_good': state.district.okey,
                         'mBlock__input_error': state.district.error
                     }" v-model="district" placeholder="Например: Войковский">
 
-                    <label class="mBlock__label" for="mBlock__input__square">Площадь (кв.м)</label>
+                    <label :class="{'mBlock__label': true, 'mBlock__label_error': state.square.error, 'mBlock__label_good': state.square.okey}" for="mBlock__input__square">
+                        Площадь (кв.м)
+                        <i class="mdi mdi-checkbox-marked-circle-outline mBlock__checked"></i>
+                    </label>
                     <input type="text" id="mBlock__input__square" :class="{
                         'mBlock__input': true,
                         'mBlock__input_good': state.square.okey,
                         'mBlock__input_error': state.square.error
-                    }" v-model="square" placeholder="Например: 1400 ㎡" @keypress="addSymbol($event, $event.target, '㎡')">
+                    }" v-model="square" placeholder="Например: 1400 ㎡">
 
-                    <label class="mBlock__label" for="mBlock__input__cadastral_number">Кадастравый номер</label>
+                    <label :class="{'mBlock__label': true, 'mBlock__label_error': state.cadastral_number.error, 'mBlock__label_good': state.cadastral_number.okey}" for="mBlock__input__cadastral_number">
+                        Кадастравый номер
+                        <i class="mdi mdi-checkbox-marked-circle-outline mBlock__checked"></i>
+                    </label>
                     <masked id="mBlock__input__cadastral_number" mask="11:11:1111111:111" placeholder="Например: 00:00:0000000:000"
                         :class="{
                             'mBlock__input': true,
@@ -136,7 +136,10 @@
                             'mBlock__input_error': state.cadastral_number.error
                         }" v-model="cadastral_number" />
 
-                    <label class="mBlock__label" for="mBlock__input__exploitation_permission">Вид разрешенного использования</label>
+                    <label :class="{'mBlock__label': true, 'mBlock__label_error': state.exploitation_permission.error, 'mBlock__label_good': state.exploitation_permission.okey}" for="mBlock__input__exploitation_permission">
+                        Вид разрешенного использования
+                        <i class="mdi mdi-checkbox-marked-circle-outline mBlock__checked"></i>
+                    </label>
                     <input type="text" id="mBlock__input__exploitation_permission" :class="{
                         'mBlock__input': true,
                         'mBlock__input_good': state.exploitation_permission.okey,
@@ -145,7 +148,10 @@
                 </div>
                 <div class="mBlock__col6">
 
-                    <label class="mBlock__label" for="mBlock__input__rights_type">Вид права</label>
+                    <label :class="{'mBlock__label': true, 'mBlock__label_error': state.rights_type.error, 'mBlock__label_good': state.rights_type.okey}" for="mBlock__input__rights_type">
+                        Вид права
+                        <i class="mdi mdi-checkbox-marked-circle-outline mBlock__checked"></i>
+                    </label>
                     <input type="text" id="mBlock__input__rights_type"
                         :class="{
                             'mBlock__input': true,
@@ -153,15 +159,21 @@
                             'mBlock__input_error': state.rights_type.error
                         }" v-model="rights_type" placeholder="Например: собственность">
 
-                    <label class="mBlock__label" for="mBlock__input__surface_square">Наземная площадь</label>
+                    <label :class="{'mBlock__label': true, 'mBlock__label_error': state.surface_square.error, 'mBlock__label_good': state.surface_square.okey}" for="mBlock__input__surface_square">
+                        Наземная площадь
+                        <i class="mdi mdi-checkbox-marked-circle-outline mBlock__checked"></i>
+                    </label>
                     <input type="text" id="mBlock__input__surface_square"
                         :class="{
                             'mBlock__input': true,
                             'mBlock__input_good': state.surface_square.okey,
                             'mBlock__input_error': state.surface_square.error
-                        }" v-model="surface_square" placeholder="Например: 6935 ㎡" @keypress="addSymbol($event, $event.target, '㎡')">
+                        }" v-model="surface_square" placeholder="Например: 6935 ㎡">
 
-                    <label class="mBlock__label" for="mBlock__input__building_density">Плотность застройки</label>
+                    <label :class="{'mBlock__label': true, 'mBlock__label_error': state.building_density.error, 'mBlock__label_good': state.building_density.okey}" for="mBlock__input__building_density">
+                        Плотность застройки
+                        <i class="mdi mdi-checkbox-marked-circle-outline mBlock__checked"></i>
+                    </label>
                     <input type="text" id="mBlock__input__building_density"
                         :class="{
                             'mBlock__input': true,
@@ -169,7 +181,10 @@
                             'mBlock__input_error': state.building_density.error
                         }" v-model="building_density" placeholder="Например: 50">
 
-                    <label class="mBlock__label" for="mBlock__input__effective_square_index">Коэфициент для рассчёта полезной площади</label>
+                    <label :class="{'mBlock__label': true, 'mBlock__label_error': state.effective_square_index.error, 'mBlock__label_good': state.effective_square_index.okey}" for="mBlock__input__effective_square_index">
+                        Коэфициент для рассчёта полезной площади
+                        <i class="mdi mdi-checkbox-marked-circle-outline mBlock__checked"></i>
+                    </label>
                     <input type="text" id="mBlock__input__effective_square_index"
                         :class="{
                             'mBlock__input': true,
@@ -177,33 +192,45 @@
                             'mBlock__input_error': state.effective_square_index.error
                         }" v-model="effective_square_index" placeholder="Например: 0.70">
 
-                    <label class="mBlock__label" for="mBlock__input__effective_square">Полезная/продаваемая площадь</label>
+                    <label :class="{'mBlock__label': true, 'mBlock__label_error': state.effective_square.error, 'mBlock__label_good': state.effective_square.okey}" for="mBlock__input__effective_square">
+                        Полезная/продаваемая площадь
+                        <i class="mdi mdi-checkbox-marked-circle-outline mBlock__checked"></i>
+                    </label>
                     <input type="text" id="mBlock__input__effective_square"
                         :class="{
                             'mBlock__input': true,
                             'mBlock__input_good': state.effective_square.okey,
                             'mBlock__input_error': state.effective_square.error
-                        }" v-model="effective_square" placeholder="Например: 4855 ㎡" @keypress="addSymbol($event, $event.target, '㎡')">
+                        }" v-model="effective_square" placeholder="Например: 4855 ㎡">
 
-                    <label class="mBlock__label" for="mBlock__input__price">Стоимость</label>
+                    <label :class="{'mBlock__label': true, 'mBlock__label_error': state.price.error, 'mBlock__label_good': state.price.okey}" for="mBlock__input__price">
+                        Стоимость
+                        <i class="mdi mdi-checkbox-marked-circle-outline mBlock__checked"></i>
+                    </label>
                     <input type="text" id="mBlock__input__price"
                         :class="{
                             'mBlock__input': true,
                             'mBlock__input_good': state.price.okey,
                             'mBlock__input_error': state.price.error
-                        }" v-model="price" placeholder="Например: 10 000 000 ₽" @keypress="addSymbol($event, $event.target, '₽')">
+                        }" v-model="price" placeholder="Например: 10 000 000 ₽" >
                 </div>
 
-                <button class="modal__button" @click="saveData">
-                    <i class="mdi mdi-content-save"></i>
+                <button
+                    :class="{
+                        'modal__button': true,
+                        'modal__button_disabled': activeMap
+                    }"
+                    :disabled="activeMap"
+                    @click="saveData"
+                >
                     Сохранить
+                    <i class="mdi mdi-content-save"></i>
                 </button>
             </div>
         </div>
     </div>
 </template>
 <script>
-// import lodash from 'lodash'
 import masked from 'vue-masked-input'
 
 export default {
@@ -211,6 +238,24 @@ export default {
     computed:{ },
     components:{masked},
     watch:{
+        status(){
+            if(this.status !== ''){
+                this.state.status.error = false;
+                this.state.status.okey = true;
+            }
+        },
+        city_plan(){
+            if(this.city_plan !== ''){
+                this.state.city_plan.error = false;
+                this.state.city_plan.okey = true;
+            }
+        },
+        purpose_trading(){
+            if(this.purpose_trading !== ''){
+                this.state.purpose_trading.error = false;
+                this.state.purpose_trading.okey = true;
+            }
+        },
         async address(){
             await this.validate(this.address, 'address');
         },
@@ -221,12 +266,23 @@ export default {
             await this.validate(this.district, 'district');
         },
         async square(){
-            await this.validate(this.square, 'square', 1);
+            this.square = this.addSymbol('mBlock__input__square');
+
+            if(this.square !== '' && this.square.length >= 4){
+                this.state.square.error = false;
+                this.state.square.okey = true;
+            }else{
+                this.state.square.okey = false;
+                this.state.square.error = true;
+            }
         },
         async cadastral_number(){
             if(this.cadastral_number.slice(-1) !== '_' && this.cadastral_number !== ''){
-                console.log('GOOD - ', this.cadastral_number)
-
+                this.state.cadastral_number.error = false;
+                this.state.cadastral_number.okey = true;
+            }else{
+                this.state.cadastral_number.okey = false;
+                this.state.cadastral_number.error = true;
             }
         },
         async exploitation_permission(){
@@ -236,7 +292,15 @@ export default {
             await this.validate(this.rights_type, 'rights_type');
         },
         async surface_square(){
-            await this.validate(this.surface_square, 'surface_square');
+            this.surface_square = this.addSymbol('mBlock__input__surface_square');
+
+            if(this.surface_square !== '' && this.surface_square.length >= 4){
+                this.state.surface_square.error = false;
+                this.state.surface_square.okey = true;
+            }else{
+                this.state.surface_square.okey = false;
+                this.state.surface_square.error = true;
+            }
         },
         async building_density(){
             await this.validate(this.building_density, 'building_density');
@@ -245,13 +309,26 @@ export default {
             await this.validate(this.effective_square_index, 'effective_square_index');
         },
         async effective_square(){
-            await this.validate(this.effective_square, 'effective_square');
+            this.effective_square = this.addSymbol('mBlock__input__effective_square');
+
+            if(this.effective_square !== '' && this.effective_square.length >= 4){
+                this.state.effective_square.error = false;
+                this.state.effective_square.okey = true;
+            }else{
+                this.state.effective_square.okey = false;
+                this.state.effective_square.error = true;
+            }
         },
         async price(){
-            await this.validate(this.price, 'price');
-        },
-        state(){
-            console.log(this.state)
+            this.price = this.addSymbol('mBlock__input__price' ,'₽');
+
+            if(this.price !== '' && this.price.length >= 4){
+                this.state.price.error = false;
+                this.state.price.okey = true;
+            }else{
+                this.state.price.okey = false;
+                this.state.price.error = true;
+            }
         }
     },
     data () {
@@ -259,8 +336,6 @@ export default {
             activeMap: false,
             errorHandler: [],
             state: {
-                // validated: false,
-
                 address: { okey: false, error: false },
                 area: { okey: false, error: false },
                 district: { okey: false, error: false },
@@ -273,41 +348,31 @@ export default {
                 effective_square_index: { okey: false, error: false },
                 effective_square: { okey: false, error: false },
                 price: { okey: false, error: false },
+
+                status: { okey: false, error: false },
+                city_plan: { okey: false, error: false },
+                purpose_trading: { okey: false, error: false },
             },
 
-            address: null,
+            /* INPUTS */
+            address: 'Пушкинская',
             area: null,
             district: null,
-            square: null,
+            square: 500,
             cadastral_number: null,
             exploitation_permission: null,
-            rights_type: null,
+            rights_type: 'Аренда',
             surface_square: null,
             building_density: null,
             effective_square_index: null,
             effective_square: null,
-            price: null,
+            price: 11750000,
+            /* RADIO */
+            status: null,
+            city_plan: 'Да',
+            purpose_trading: null,
 
-            fields: {
-                /* INPUT */
-
-                // address: null,
-                // area: null,
-                // district: null,
-                // cadastral_number: null,
-                // exploitation_permission: null,
-                // rights_type: null,
-                // surface_square: null,
-                // building_density: null,
-                // effective_square_index: null,
-                // effective_square: null,
-                // price: null,
-
-                /* RADIO */
-                status: null,
-                city_plan: null,
-                purpose_trading: null
-            },
+            fields: { },
 
             ymap: null,
 
@@ -330,20 +395,37 @@ export default {
         polygon = polygonData.toString().replace(/\s|\[|\]/g,"");
 
         document.getElementById('map').style.backgroundImage = `url('https://static-maps.yandex.ru/1.x/?size=650,250&z=16&l=map&pl=c:757979C0,f:86C678A0,w:2,${polygon}')`;
+
+        await this.setData();
+
+        /* CHECK ON EMPTY VALUE */
+        for(let item in this.fields){
+           if(item === 'placeMark' || item === 'newPolygon' || item === 'polygonCoordinates'){continue;}
+           else{
+                if(!this.fields[item]){
+                    this.state[item].error = true;
+                }else{
+                    this.state[item].okey = true;
+                }
+            }
+        }
+
+
+    },
+    created(){
+        console.info('Created...');
     },
     methods:{
-        addSymbol(event, target = null, symbol = null){
-            if(event.key.length > 1) return true;
-            target.value = (target.value+event.key)
+        /* FIELDS METHODS */
+        addSymbol(id, symbol = '㎡'){
+            return document.getElementById(id).value
                     .replace(/\D/g, '')
                     .replace(/(\d)(?=(\d{3})+([^\d]|$))/g, '$1 ')
                 + ' ' + symbol;
-            event.preventDefault();
         },
-        validate(value, name, min = 3){
+        validate(value, name, min = 2){
             let regExp = /\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;/g,
                 res = value.match(regExp);
-
             Object.defineProperties(this.state[name], {
                 'okey': {
                     value: false,
@@ -371,47 +453,7 @@ export default {
                 });
             }
         },
-        // validate: lodash.debounce(
-        //     function(value, name, min = 2){
-        //         // console.log(value);
-        //
-        //         let regExp = /\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\>|\?|\/|\""|\;/g,
-        //             res = value.match(regExp);
-        //
-        //         Object.defineProperties(this.state[name], {
-        //             'okey': {
-        //                 value: false,
-        //                 writable: true
-        //             },
-        //             'error': {
-        //                 value: false,
-        //                 writable: true
-        //             }
-        //         });
-        //
-        //         if(!res && value.length >= min){
-        //             Object.defineProperties(this.state[name], {
-        //                 'okey': {
-        //                     value: true,
-        //                     writable: true
-        //                 }
-        //             });
-        //             console.log('good')
-        //         }else{
-        //             console.warn('Error');
-        //             this.errorHandler.push({name: name, error: true})
-        //             /* ------------------------------ */
-        //             Object.defineProperties(this.state[name], {
-        //                 'error': {
-        //                     value: true,
-        //                     writable: true
-        //                 }
-        //             });
-        //         }
-        //         // console.log(this.state[name]);
-        //     },350
-        // ),
-
+        /* MAP METHODS */
         setPolygon(){
             this.activeMap = true;
             this.editingState.editPolygon = true;
@@ -613,10 +655,14 @@ export default {
             return newArr;
         },
         /* FUCKING MAGIC - DO NOT TOUCH end */
-
-        saveData(){
-
+        /* SETTING DATA */
+        setData(){
             this.fields = {
+                /* MAP */
+                placeMark: this.placeMark,
+                newPolygon: this.newPolygon,
+                polygonCoordinates: this.polygonCoordinates,
+                /* INPUTS */
                 address: this.address,
                 area: this.area,
                 district: this.district,
@@ -629,15 +675,41 @@ export default {
                 effective_square_index: this.effective_square_index,
                 effective_square: this.effective_square,
                 price: this.price,
-            }
+                /* RADIOS */
+                status: this.status,
+                city_plan: this.city_plan,
+                purpose_trading: this.purpose_trading,
+            };
+        },
+        /* SAVING DATA */
+        saveData(){
+            this.fields = {
+                /* INPUTS */
+                address: this.address,
+                area: this.area,
+                district: this.district,
+                square: this.square.slice(0,-2).replace(/\s/g, ""),
+                cadastral_number: this.cadastral_number,
+                exploitation_permission: this.exploitation_permission,
+                rights_type: this.rights_type,
+                surface_square: this.surface_square.slice(0,-2).replace(/\s/g, ""),
+                building_density: this.building_density,
+                effective_square_index: this.effective_square_index,
+                effective_square: this.effective_square.slice(0,-2).replace(/\s/g, ""),
+                price: this.price.slice(0,-2).replace(/\s/g, ""),
+                /* RADIOS */
+                status: this.status,
+                city_plan: this.city_plan,
+                purpose_trading: this.purpose_trading,
+                /* MAP */
+                placeMark: this.placeMark,
+                newPolygon: this.newPolygon,
+                polygonCoordinates: this.polygonCoordinates
+            };
 
-            this.fields.placeMark = this.placeMark;
-            this.fields.newPolygon = this.newPolygon;
-            this.fields.polygonCoordinates = this.polygonCoordinates;
-            this.$emit('save', this.fields)
+            this.$emit('save', this.fields);
         },
     },
-
 }
 </script>
 <style scoped>
@@ -859,10 +931,23 @@ input:-ms-input-placeholder{
 
 .mBlock__label{
     display: block;
+    position: relative;
     font-size: 12px;
     color: #78909c;
     font-weight: 700;
     text-align: left;
+}
+.mBlock__label_error{ color: #DC143C; }
+.mBlock__checked{
+    display: none;
+    position: absolute;
+    top: 30px;
+    right: 25px;
+    font-size: 18px;
+}
+.mBlock__label_good .mBlock__checked{
+    display: block;
+    color: #4EB645;
 }
 .mBlock__label_radio{
     font-size: 14px;
@@ -881,10 +966,6 @@ input:-ms-input-placeholder{
     border-radius: 4px;
     border: 1px solid #566270;
 }
-.mBlock__input_good{
-    border-color: #4EB645;
-}
-.mBlock__input_error{
-    border-color: #DC143C;
-}
+/*.mBlock__input_good{ border-color: #4EB645; }*/
+.mBlock__input_error{ border-color: #DC143C; }
 </style>
