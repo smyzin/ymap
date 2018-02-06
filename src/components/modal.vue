@@ -28,12 +28,10 @@
             >Редактировать метку</button>
             <br/>
             <button class="modal__button"
-                @click="savePolygon()"
+                @click="anyChanges?savePolygon():cancelChanges()"
                 v-if="activeMap"
-            >Сохранить</button>
-
+            >{{anyChanges?'Сохранить':'Отмена'}}</button>
             <div class="mBlock">
-
                 <div class="mBlock__col6">
                     <div class="mBlock__radio">
                         <p :class="{'mBlock__label': true, 'mBlock__label_error': state.status.error, 'mBlock__label_good': state.status.okey}">Статус продажи: </p>
@@ -334,7 +332,7 @@ export default {
     data () {
         return {
             activeMap: false,
-            errorHandler: [],
+            anyChanges: false,
             state: {
                 address: { okey: false, error: false },
                 area: { okey: false, error: false },
@@ -381,20 +379,23 @@ export default {
                 editPlaceMark: false,
             },
 
-            placeMark: null,
-            newPolygon: null,
+            placeMark: null, //[55.79827889999367,37.41016569999998],
+            newPolygon: [[55.798385,37.410639],[55.798563,37.4098148],[55.7983715,37.4096924],[55.7982466,37.409713],[55.7981138,37.4098607],[55.7979948,37.4103682],[55.798385,37.410639]],
             polygonCoordinates: null,
-
-            coordinates: [[55.798385,37.410639],[55.798563,37.4098148],[55.7983715,37.4096924],[55.7982466,37.409713],[55.7981138,37.4098607],[55.7979948,37.4103682],[55.798385,37.410639]]
         }
     },
     async mounted(){
-        let polygon, polygonData;
+        let polygon, polygonData, placemark;
 
-        polygonData = this.reverseArr(this.coordinates);
+        polygonData = this.reverseArr(this.newPolygon);
         polygon = polygonData.toString().replace(/\s|\[|\]/g,"");
 
-        document.getElementById('map').style.backgroundImage = `url('https://static-maps.yandex.ru/1.x/?size=650,250&z=16&l=map&pl=c:757979C0,f:86C678A0,w:2,${polygon}')`;
+        if(this.placeMark !== null){
+            placemark = this.placeMark.reverse();
+            document.getElementById('map').style.backgroundImage = `url('https://static-maps.yandex.ru/1.x/?size=650,250&z=16&l=map&pl=c:757979C0,f:86C678A0,w:2,${polygon}&pt=${placemark[0]},${placemark[1]},pm2gnm')`;
+        }else{
+            document.getElementById('map').style.backgroundImage = `url('https://static-maps.yandex.ru/1.x/?size=650,250&z=16&l=map&pl=c:757979C0,f:86C678A0,w:2,${polygon}')`;
+        }
 
         await this.setData();
 
@@ -409,8 +410,6 @@ export default {
                 }
             }
         }
-
-
     },
     created(){
         console.info('Created...');
@@ -455,64 +454,15 @@ export default {
         },
         /* MAP METHODS */
         setPolygon(){
+            let temp = null;
+
             this.activeMap = true;
             this.editingState.editPolygon = true;
 
-            let temp = null;
-
             if(!this.newPolygon){
                 temp = [[55.798385,37.410639],[55.798563,37.4098148],[55.7983715,37.4096924],[55.7982466,37.409713],[55.7981138,37.4098607],[55.7979948,37.4103682],[55.798385,37.410639]];
             }else{
-                temp = this.reverseArrBack(this.newPolygon[0]);
-            }
-
-            return new Promise((resolve, reject)=> {
-                ymaps.ready(()=>{
-                    this.ymap = new ymaps.Map("map", {
-                        center: [55.79827889999367, 37.41016569999997],
-                        zoom: 17,
-                        controls: []
-                    });
-
-                    let myPolygon = new ymaps.Polygon([
-                        temp
-                    ], {}, {
-                        editorDrawingCursor: "crosshair",
-                        // editorMaxPoints: 7,
-                        fillColor: '#86C678',
-                        strokeColor: '#757979',
-                        fillOpacity: .5,
-                        strokeWidth: 2
-                    });
-
-                    this.ymap.geoObjects.add(myPolygon);
-                    this.ymap.state.center = myPolygon.geometry.getBounds();
-
-                    let stateMonitor = new ymaps.Monitor(myPolygon.editor.state);
-                    stateMonitor.add("drawing", function (newValue) {
-                        myPolygon.options.set("strokeColor", newValue ? '#59AC46' : '#757979');
-                    });
-
-                    myPolygon.editor.startDrawing();
-
-                    myPolygon.events.add('geometrychange', ()=>{
-                        // let temp = myPolygon.geometry.getCoordinates();
-                        this.newPolygon = myPolygon.geometry.getCoordinates();
-                        this.polygonCoordinates = myPolygon.geometry.getBounds();
-                    });
-                })
-            });
-        },
-        setMark(){
-            let temp = null;
-
-            this.activeMap = true;
-            this.editingState.editPlaceMark = true;
-
-            if(!this.newPolygon){
-                temp = [[55.798385,37.410639],[55.798563,37.4098148],[55.7983715,37.4096924],[55.7982466,37.409713],[55.7981138,37.4098607],[55.7979948,37.4103682],[55.798385,37.410639]];
-            }else{
-                temp = this.reverseArrBack(this.newPolygon[0]);
+                temp = this.reverseArrBack(this.newPolygon);
             }
 
             return new Promise((resolve, reject)=> {
@@ -546,13 +496,67 @@ export default {
                         this.placeMark = this.getPolyCenter(myPolygon.geometry.getBounds());
                     }
 
-                    let myPlacemark = new ymaps.Placemark(this.placeMark, {
-                        // Чтобы балун и хинт открывались на метке, необходимо задать ей определенные свойства.
-                        // balloonContentHeader: "Балун метки",
-                        // balloonContentBody: "Содержимое <em>балуна</em> метки",
-                        // balloonContentFooter: "Подвал",
-                        // hintContent: "Хинт метки"
-                    },{
+                    let myPlacemark = new ymaps.Placemark(this.placeMark, {},{
+                        draggable: false,
+                        preset: 'islands#darkGreenDotIcon',
+                        iconColor: '#59AC46'
+                    });
+
+                    this.ymap.geoObjects.add(myPlacemark);
+
+                    myPolygon.editor.startDrawing();
+                    myPolygon.events.add('geometrychange', ()=>{
+                        this.anyChanges = true;
+                        this.newPolygon = myPolygon.geometry.getCoordinates();
+                        this.polygonCoordinates = myPolygon.geometry.getBounds();
+                    });
+                })
+            });
+        },
+        setMark(){
+            let temp = null;
+
+            this.activeMap = true;
+            this.editingState.editPlaceMark = true;
+
+            if(!this.newPolygon){
+                temp = [[55.798385,37.410639],[55.798563,37.4098148],[55.7983715,37.4096924],[55.7982466,37.409713],[55.7981138,37.4098607],[55.7979948,37.4103682],[55.798385,37.410639]];
+            }else{
+                temp = this.reverseArrBack(this.newPolygon);
+            }
+
+            return new Promise((resolve, reject)=> {
+                ymaps.ready(()=>{
+                    this.ymap = new ymaps.Map("map", {
+                        center: [55.79827889999367, 37.41016569999997],
+                        zoom: 17,
+                        controls: []
+                    });
+
+                    let myPolygon = new ymaps.Polygon([
+                        temp
+                    ], {}, {
+                        editorDrawingCursor: "crosshair",
+                        // editorMaxPoints: 7,
+                        fillColor: '#86C678',
+                        strokeColor: '#757979',
+                        fillOpacity: .5,
+                        strokeWidth: 2
+                    });
+
+                    this.ymap.geoObjects.add(myPolygon);
+                    this.ymap.state.center = myPolygon.geometry.getBounds();
+
+                    let stateMonitor = new ymaps.Monitor(myPolygon.editor.state);
+                    stateMonitor.add("drawing", function (newValue) {
+                        myPolygon.options.set("strokeColor", newValue ? '#59AC46' : '#757979');
+                    });
+
+                    if(!this.placeMark){
+                        this.placeMark = this.getPolyCenter(myPolygon.geometry.getBounds());
+                    }
+
+                    let myPlacemark = new ymaps.Placemark(this.placeMark, {},{
                         draggable: true,
                         preset: 'islands#darkGreenDotIcon',
                         iconColor: '#59AC46'
@@ -561,6 +565,7 @@ export default {
                     this.ymap.geoObjects.add(myPlacemark);
 
                     myPlacemark.events.add('dragend', (e)=>{
+                        this.anyChanges = true;
                         this.placeMark = myPlacemark.geometry.getCoordinates();
                     });
                 })
@@ -577,32 +582,63 @@ export default {
 
             return [avgY, avgX];
         },
+        cancelChanges(){
+            this.activeMap = false;
+            this.editingState.editPlaceMark = false;
+            this.editingState.editPolygon = false;
+            this.anyChanges = false;
+
+            this.ymap.destroy();
+        },
         savePolygon(){
             let mapHover = document.getElementById('map'),
-                arr, polygonCoord, implement;
+                arr, polygonCoord, implement, placemark, temp;
 
             if(this.editingState.editPolygon){
                 implement = new Promise((resolve, reject)=>{
-                    arr = this.reverseArr(this.newPolygon, true);
-                    polygonCoord = arr.toString().replace(/\s|\[|\]/g,"");
-                    mapHover.style.backgroundImage = `url('https://static-maps.yandex.ru/1.x/?size=650,250&z=15&l=map&pl=c:757979C0,f:86C678A0,w:2,${polygonCoord}')`;
+                    console.info('Save polygon');
+                    polygonCoord = this.reverseArr(this.newPolygon, true).toString().replace(/\s|\[|\]/g,"");
 
+                    if(this.placeMark !== null){
+                        placemark = this.placeMark.reverse();
+                        mapHover.style.backgroundImage = `url('https://static-maps.yandex.ru/1.x/?size=650,250&z=15&l=map&pl=c:757979C0,f:86C678A0,w:2,${polygonCoord}&pt=${placemark[0]},${placemark[1]},pm2gnm')`;
+                    }else{
+                        arr = this.getPolyCenter(this.polygonCoordinates);
+                        placemark = arr.reverse();
+                        this.placeMark = placemark;
+                        mapHover.style.backgroundImage = `url('https://static-maps.yandex.ru/1.x/?size=650,250&z=15&l=map&pl=c:757979C0,f:86C678A0,w:2,${polygonCoord}&pt=${placemark[0]},${placemark[1]},pm2gnm')`;
+                    }
                     resolve(true)
                 });
             }else if(this.editingState.editPlaceMark){
                 implement = new Promise((resolve, reject)=>{
-                    arr = this.reverseArr(this.newPolygon, true);
-                    polygonCoord = arr.toString().replace(/\s|\[|\]/g,"");
-                    mapHover.style.backgroundImage = `url('https://static-maps.yandex.ru/1.x/?size=650,250&z=15&l=map&pl=c:757979C0,f:86C678A0,w:2,${polygonCoord}')`;
+                    console.info('Save mark');
+                    polygonCoord = this.reverseArr(this.newPolygon).toString().replace(/\s|\[|\]/g,"");
+                    placemark = this.placeMark.reverse();
+
+                    mapHover.style.backgroundImage = `url('https://static-maps.yandex.ru/1.x/?size=650,250&z=15&l=map&pl=c:757979C0,f:86C678A0,w:2,${polygonCoord}&pt=${placemark[0]},${placemark[1]},pm2gnm')`;
 
                     resolve(true)
                 });
             }
 
             if(implement) {
+                /* !!! MAGIC !!! */
+                /* REVERSE PLACEMARK */
+                this.placeMark = this.placeMark.reverse();
+                /* REVERSE PLACEMARK end */
+                /* REVERSE POLYGON */
+                if(this.newPolygon.length <= 2){
+                    this.newPolygon = this.newPolygon[0];
+                }
+                temp = this.reverseArrBack(this.newPolygon);
+                this.newPolygon = temp;
+                /* REVERSE POLYGON end */
+                /* !!! MAGIC end !!! */
                 this.activeMap = false;
                 this.editingState.editPlaceMark = false;
                 this.editingState.editPolygon = false;
+                this.anyChanges = false;
 
                 this.ymap.destroy();
             }
@@ -611,6 +647,7 @@ export default {
         reverseArr(arr, newCoord = false){
             let reverse, newArr;
 
+            if(!arr) return true;
             if(newCoord){
                 newArr = arr[0].map((el, index)=>{
                     if(el[0].toString().slice(0,1) !== '3'){
