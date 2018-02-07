@@ -4,12 +4,66 @@
         <div class="modal__block">
             <h2 class="modal__title">Редактировать запись</h2>
 
-            <div :class="{
+            <div class="mBlock">
+                <div class="mBlock__col4">
+                    <label :class="{'mBlock__label': true, 'mBlock__label_object':true, 'mBlock__label_error': state.objects.error, 'mBlock__label_good': state.objects.okey}" for="mBlock__input__cadastral_number">
+                        Объекты
+                        <button
+                                :class="{
+                                'modal__button': true,
+                                'modal__button_addObj': true,
+                                'modal__button_addObj_disabled': state.objects.error
+                            }"
+                                :disabled="state.objects.error"
+                                title="Добавить еще один кадастровый номер" @click="countList++; cutMask()">+</button>
+                        <button
+                                :class="{
+                                'modal__button': true,
+                                'modal__button_setMark': true,
+                                'modal__button_setMark_disabled': state.objects.error
+                            }"
+                                :disabled="state.objects.error"
+                                title="Добавить еще один кадастровый номер" @click="console.log('Set placemark')">
+                            <i class="mdi mdi-map-marker"></i>
+                        </button>
+                    </label>
+                    <div class="object"
+                         v-for="(item, index) in countList"
+                         :key="item"
+                    >
+                        <masked id="mBlock__input__cadastral_number"
+                            mask="11:11:1111111:11111"
+                            placeholder="00:00:0000000:000"
+                            :class="{
+                            'mBlock__input': true,
+                            'mBlock__input_object': true,
+                            'mBlock__input_good': state.objects.okey,
+                            'mBlock__input_error': state.objects.error
+                        }" v-model="objects_cadastre_number[index]" />
+                        <button
+                            :class="{
+                                'modal__button': true,
+                                'modal__button_edit': true,
+                                'modal__button_edit_disabled': state.objects.error
+                            }"
+                            :disabled="state.objects.error"
+                            title="Редактировать полигон объекта" @click="workWithPolygon(objects[index].cadastre_number, objects[index].polygon)">
+                            <i class="mdi mdi-vector-polygon"></i>
+                        </button>
+                    </div>
+
+
+                    <!--<button type="button" class="viewIn__removeBtn" @click="removeItemList(index)" v-if="countList >= 2 && listArr[index] !== ''">X</button>-->
+                </div>
+                <div id="map"
+                     :class="{
                     'modal__hover': true,
+                    'mBlock__col8': true,
                     'modal__hover_active': activeMap
                  }"
-                 id="map"
-            ></div>
+                ></div>
+            </div>
+
             <button
                 :class="{
                     'modal__button': true,
@@ -123,17 +177,30 @@
                         'mBlock__input_error': state.square.error
                     }" v-model="square" placeholder="Например: 1400 ㎡">
 
-                    <label :class="{'mBlock__label': true, 'mBlock__label_error': state.cadastral_number.error, 'mBlock__label_good': state.cadastral_number.okey}" for="mBlock__input__cadastral_number">
-                        Кадастравый номер
-                        <i class="mdi mdi-checkbox-marked-circle-outline mBlock__checked"></i>
-                    </label>
-                    <masked id="mBlock__input__cadastral_number" mask="11:11:1111111:111" placeholder="Например: 00:00:0000000:000"
-                        :class="{
-                            'mBlock__input': true,
-                            'mBlock__input_good': state.cadastral_number.okey,
-                            'mBlock__input_error': state.cadastral_number.error
-                        }" v-model="cadastral_number" />
+                    <!--<label :class="{'mBlock__label': true, 'mBlock__label_error': state.cadastral_number.error, 'mBlock__label_good': state.cadastral_number.okey}" for="mBlock__input__cadastral_number">-->
+                        <!--Кадастравый номер-->
+                        <!--<i class="mdi mdi-checkbox-marked-circle-outline mBlock__checked"></i>-->
+                        <!--<button-->
+                            <!--:class="{-->
+                                <!--'modal__button': true,-->
+                                <!--'modal__button_addField': true,-->
+                                <!--'modal__button_disabled': state.cadastral_number.error-->
+                            <!--}"-->
+                            <!--:disabled="state.cadastral_number.error"-->
+                            <!--title="Добавить еще один кадастровый номер" @click="countList++; cutMask()">+</button>-->
+                    <!--</label>-->
 
+                    <!--<masked id="mBlock__input__cadastral_number"-->
+                        <!--mask="11:11:1111111:11111"-->
+                        <!--placeholder="Например: 00:00:0000000:000"-->
+                        <!--v-for="(item, index) in countList"-->
+                        <!--:key="item"-->
+                        <!--:class="{-->
+                            <!--'mBlock__input': true,-->
+                            <!--'mBlock__input_good': state.cadastral_number.okey,-->
+                            <!--'mBlock__input_error': state.cadastral_number.error-->
+                        <!--}" v-model="cadastral_number[index]" />-->
+                        <!--<button type="button" class="viewIn__removeBtn" @click="removeItemList(index)" v-if="countList >= 2 && listArr[index] !== ''">X</button>-->
                     <label :class="{'mBlock__label': true, 'mBlock__label_error': state.exploitation_permission.error, 'mBlock__label_good': state.exploitation_permission.okey}" for="mBlock__input__exploitation_permission">
                         Вид разрешенного использования
                         <i class="mdi mdi-checkbox-marked-circle-outline mBlock__checked"></i>
@@ -254,6 +321,50 @@ export default {
                 this.state.purpose_trading.okey = true;
             }
         },
+
+        async objects_cadastre_number(){
+            if(this.objects.length < this.objects_cadastre_number.length){
+                console.info('Add new record');
+                this.objects.push({
+                    cadastre_number: this.objects_cadastre_number[this.objects_cadastre_number.length] !== undefined ? this.objects_cadastre_number[this.objects_cadastre_number.length] : '',
+                    polygon: []
+                });
+            }else{
+                console.info('Edit an existing record !!!');
+                for(let index in this.objects_cadastre_number){
+                    this.objects[index].cadastre_number = this.objects_cadastre_number[index];
+                    if(this.objects[index].cadastre_number !== ''){
+                        if(this.objects[index].cadastre_number.slice(-5) !== '_____'){
+                            this.state.objects.error = false;
+                            this.state.objects.okey = true;
+                        }else{
+                            this.state.objects.okey = false;
+                            this.state.objects.error = true;
+                        }
+                    }else{
+                        this.state.objects.okey = false;
+                        this.state.objects.error = true;
+                    }
+                }
+            }
+        },
+        async objects(){
+            for(let index in this.objects){
+                console.log(this.objects[index].cadastre_number);
+                if(this.objects[index].cadastre_number !== ''){
+                    if(this.objects[index].cadastre_number.slice(-5) !== '_____'){
+                        this.state.objects.error = false;
+                        this.state.objects.okey = true;
+                    }else{
+                        this.state.objects.okey = false;
+                        this.state.objects.error = true;
+                    }
+                }else{
+                    this.state.objects.okey = false;
+                    this.state.objects.error = true;
+                }
+            }
+        },
         async address(){
             await this.validate(this.address, 'address');
         },
@@ -275,12 +386,19 @@ export default {
             }
         },
         async cadastral_number(){
-            if(this.cadastral_number.slice(-1) !== '_' && this.cadastral_number !== ''){
-                this.state.cadastral_number.error = false;
-                this.state.cadastral_number.okey = true;
-            }else{
-                this.state.cadastral_number.okey = false;
-                this.state.cadastral_number.error = true;
+            for(let index in this.cadastral_number){
+                if(this.cadastral_number[index] !== ''){
+                    if(this.cadastral_number[index].slice(-5) !== '_____'){
+                        this.state.cadastral_number.error = false;
+                        this.state.cadastral_number.okey = true;
+                    }else{
+                        this.state.cadastral_number.okey = false;
+                        this.state.cadastral_number.error = true;
+                    }
+                }else{
+                    this.state.cadastral_number.okey = false;
+                    this.state.cadastral_number.error = true;
+                }
             }
         },
         async exploitation_permission(){
@@ -333,11 +451,32 @@ export default {
         return {
             activeMap: false,
             anyChanges: false,
+
+            countList: 1,
+            // listArr: [],
+            cadastral_number: ['13:23:2132132:13', '95:03:0904034:1123'],
+
+            objects_cadastre_number: [],
+            objects: [
+                {
+                    polygon_id: 111,
+                    polygon: "[[\"123\",\"321\"],[\"123\",\"321\"]",
+                    cadastre_id: 111,
+                    cadastre_number: "11:11:1111111:11",
+                },{
+                    id: 222,
+                    polygon: "[[\"123\",\"321\"],[\"123\",\"321\"]",
+                    cadastre_id: 222,
+                    cadastre_number: "22:22:2222222:1223",
+                }
+            ],
+
             state: {
                 address: { okey: false, error: false },
                 area: { okey: false, error: false },
                 district: { okey: false, error: false },
                 square: { okey: false, error: false },
+                objects: { okey: false, error: false },
                 cadastral_number: { okey: false, error: false },
                 exploitation_permission: { okey: false, error: false },
                 rights_type: { okey: false, error: false },
@@ -357,7 +496,7 @@ export default {
             area: null,
             district: null,
             square: 500,
-            cadastral_number: null,
+            // cadastral_number: '99:99:9999999:000',
             exploitation_permission: null,
             rights_type: 'Аренда',
             surface_square: null,
@@ -371,9 +510,7 @@ export default {
             purpose_trading: null,
 
             fields: { },
-
             ymap: null,
-
             editingState: {
                 editPolygon: false,
                 editPlaceMark: false,
@@ -394,12 +531,17 @@ export default {
                     if(!res[item]){
                         this.state[item].error = true;
                     }else{
-                        this.state[item].okey = true;
+                        if(item === 'objects'){
+                            if(res[item][0].cadastre_number === '') this.state[item].error = true;
+                            else this.state[item].okey = true;
+                        }else{
+                            this.state[item].okey = true;
+                        }
                     }
                 }
             }
         }).then(()=>{
-
+            console.log('Created set !');
         });
     },
     async mounted(){
@@ -415,6 +557,14 @@ export default {
         }
     },
     methods:{
+        workWithPolygon(number, polygon){
+            console.log(number, polygon)
+        },
+        cutMask(){
+            // for(let index in this.objects){
+            //     this.objects[index].cadastre_number = this.objects[index].cadastre_number.replace(/_/g, '');
+            // }
+        },
         /* FIELDS METHODS */
         addSymbol(id, symbol = '㎡'){
             return document.getElementById(id).value
@@ -708,6 +858,13 @@ export default {
                     this.price = this.price + ' ₽';
                 }
 
+                if(this.objects.length > 0){
+                    this.countList = this.objects.length;
+                    for(let index in this.objects){
+                        this.objects_cadastre_number.push(this.objects[index].cadastre_number)
+                    }
+                }
+
                 this.fields = {
                     /* MAP */
                     placeMark: this.placeMark,
@@ -718,6 +875,7 @@ export default {
                     area: this.area,
                     district: this.district,
                     square: this.square,
+                    objects: this.objects,
                     cadastral_number: this.cadastral_number,
                     exploitation_permission: this.exploitation_permission,
                     rights_type: this.rights_type,
@@ -736,12 +894,20 @@ export default {
         },
         /* SAVING DATA */
         saveData(){
+            this.cutMask();
+
+            for(let index in this.objects_cadastre_number){
+                // this.objects[index].push({cadastre_number: this.objects_cadastre_number[index]})
+                console.log(this.objects, this.objects_cadastre_number);
+            }
+
             this.fields = {
                 /* INPUTS */
                 address: this.address,
                 area: this.area,
                 district: this.district,
                 square: this.square !== null ? this.square.slice(0,-2).replace(/\s/g, "") : this.square,
+                objects: this.objects,
                 cadastral_number: this.cadastral_number,
                 exploitation_permission: this.exploitation_permission,
                 rights_type: this.rights_type,
@@ -901,14 +1067,78 @@ input:-ms-input-placeholder{
     background: #4EB645;
     color: #fff;
 }
+.modal__button_addField{
+    position: absolute;
+    border: none;
+    width: 20px;
+    padding: 0px;
+    margin: 0;
+    top: -2px;
+    right: 20px;
+}
+.modal__button_edit{
+    position: absolute;
+    border: none;
+    border-radius: 0;
+    width: 20px;
+    padding: 0px;
+    font-size: 20px;
+    margin: 0;
+    top: 3px;
+    right: 10px;
+    background: transparent;
+}
+.modal__button_edit:hover{
+    background: transparent;
+    color: #45A03D;
+}
+.modal__button_addObj{
+    position: absolute;
+    border: none;
+    border-radius: 0;
+    width: 20px;
+    padding: 0;
+    font-size: 20px;
+    margin: 0;
+    top: -4px;
+    left: 60px;
+}
+.modal__button_addObj:hover{
+    background: transparent;
+    color: #45A03D;
+}
+.modal__button_setMark{
+    position: absolute;
+    border: none;
+    border-radius: 0;
+    /*font-size: 17px;*/
+    padding: 0px;
+    margin: 0;
+    font-size: 20px;
+    top: -4px;
+    right: 20px;
+}
+.modal__button_setMark:hover{
+    background: transparent;
+    color: #45A03D;
+}
+.modal__button_setMark_disabled, .modal__button_edit_disabled, .modal__button_addObj_disabled{
+    background: transparent;
+    color: #b5b5b5;
+    cursor: no-drop;
+}
+.modal__button_setMark_disabled:hover, .modal__button_edit_disabled:hover, .modal__button_addObj_disabled:hover{
+    background: transparent;
+    color: #b5b5b5;
+}
 .modal__button_disabled{
     cursor: no-drop;
-    background: #EDEDED;
+    background: #C1C1C1;
     color: #4EB645;
     border-color: #4EB645;
 }
 .modal__button_disabled:hover{
-    background: #EDEDED;
+    background: #C1C1C1;
     color: #4EB645;
     border-color: #4EB645;
 }
@@ -945,8 +1175,8 @@ input:-ms-input-placeholder{
     border-bottom: 2px solid #566270;
 }
 .modal__hover{
-    height: 250px;
-    margin: 0 -20px 20px -20px;
+    min-height: 250px;
+    margin: 0;
 
     background-image: url('https://loading.io/assets/img/landing/curved-bars.svg');
     background-repeat: no-repeat;
@@ -959,7 +1189,7 @@ input:-ms-input-placeholder{
 
 .mBlock{
     width: 100%;
-    height: 450px;
+    min-height: 250px;
     box-sizing: border-box;
     overflow-y: scroll;
     position: relative;
@@ -967,10 +1197,32 @@ input:-ms-input-placeholder{
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
 }
+.mBlock__col4{
+    -ms-flex: 0 0 33.333333%;
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+    position: relative;
+    width: 100%;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+    box-sizing: border-box;
+}
 .mBlock__col6{
     -ms-flex: 0 0 50%;
     flex: 0 0 50%;
     max-width: 50%;
+    position: relative;
+    width: 100%;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+    box-sizing: border-box;
+}
+.mBlock__col8{
+    -ms-flex: 0 0 66.666667%;
+    flex: 0 0 66.666667%;
+    max-width: 66.666667%;
     position: relative;
     width: 100%;
     min-height: 1px;
@@ -998,6 +1250,9 @@ input:-ms-input-placeholder{
     right: 25px;
     font-size: 18px;
 }
+.mBlock__label_object{
+    margin-bottom: 15px;
+}
 .mBlock__label_good .mBlock__checked{
     display: block;
     color: #4EB645;
@@ -1019,6 +1274,29 @@ input:-ms-input-placeholder{
     border-radius: 4px;
     border: 1px solid #566270;
 }
+.mBlock__input_object{
+    width: calc(90% - 40px);
+    /*border-top: none;*/
+    /*border-left: none;*/
+    /*border-right: none;*/
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    cursor: pointer;
+}
+.object{
+    display: block;
+    width: calc(100% - 20px);
+    position: relative;
+    background: #f6f6f6;
+    /*cursor: pointer;*/
+    /*border: 1px solid black;*/
+}
+.object:nth-of-type(odd){ background: #e9e9e9; }
+.object input{ background: #f6f6f6; }
+.object:nth-of-type(odd) input{ background: #e9e9e9; }
+.object:last-child input{ margin-bottom: 15px; }
+
 /*.mBlock__input_good{ border-color: #4EB645; }*/
 .mBlock__input_error{ border-color: #DC143C; }
 </style>
