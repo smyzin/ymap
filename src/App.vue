@@ -1,34 +1,42 @@
 <template>
     <div id="app">
-        <img src="./assets/logo.png">
+        <!--<img src="./assets/logo.png">-->
         <div class="hello">
-            <h1>Modal with YMap</h1>
-            <h2>Click on button below to open modal window</h2>
+            <h1>Модальное окно для земельных объектов</h1>
+            <h2>Кликните на кнопку ниже, чтобы открыть модальное окно</h2>
 
-            <button class="button button__modal" title="Редактировать" @click="openModal = true">
+            <button class="button button__modal" title="Редактировать" @click="openModalWindow(3)">
                 <i class="mdi mdi-pencil"></i>
-                Edit
+                Редактировать
             </button>
-            <modal v-if="openModal" @save="sendData" />
+            <modal v-if="openModal" @save="sendData" @close="closeModalWindow"/>
         </div>
     </div>
 </template>
 
 <script>
-import modal from './components/modal.vue'
+    import modal from './components/modal.vue'
 
-export default {
+    export default {
     name: 'App',
     components: { modal },
     data () {
         return {
             openModal: false,
+            objectID: null,
         }
     },
     methods:{
         sendData(value){
             console.info(value);
-            this.openModal = false;
+            this.openModal = !this.openModal;
+        },
+        openModalWindow(id) {
+            this.openModal = !this.openModal;
+            this.objectID = id;
+        },
+        closeModalWindow() {
+            this.openModal = !this.openModal;
         }
     }
 }

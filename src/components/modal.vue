@@ -1,8 +1,11 @@
 <template>
     <div class="modal">
-        <div class="modal__overlay"></div>
-        <div class="modal__block">
+        <div class="modal__overlay" id="modalOverlay" @click="closeModal()"></div>
+        <div class="modal__block" id="modalBlock">
             <h2 class="modal__title">Редактировать запись</h2>
+            <a href="!#" @click.prevent="closeModal" class="modal__close">
+                <i class="mdi mdi-window-close"></i>
+            </a>
 
             <div class="mBlock">
                 <div class="mBlock__col4">
@@ -296,9 +299,9 @@
     </div>
 </template>
 <script>
-import masked from 'vue-masked-input'
+    import masked from 'vue-masked-input'
 
-export default {
+    export default {
     name: 'Modal',
     computed:{ },
     components:{masked},
@@ -555,6 +558,14 @@ export default {
         }else{
             document.getElementById('map').style.backgroundImage = `url('https://static-maps.yandex.ru/1.x/?size=650,250&z=16&l=map&pl=c:757979C0,f:86C678A0,w:2,${polygon}')`;
         }
+
+        // document.getElementById('modalBlock').addEventListener('click', function(e){
+        //     if(!document.getElementById('modalBlock').contains(e.target)){
+        //         console.log('Outside block');
+        //     }else{
+        //         console.log('Inside block');
+        //     }
+        // });
     },
     methods:{
         workWithPolygon(number, polygon){
@@ -928,11 +939,22 @@ export default {
 
             this.$emit('save', this.fields);
         },
+        closeModal() {
+            this.$emit('close')
+        },
     },
 }
 </script>
 <style scoped>
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&subset=cyrillic');
+
+.modal__close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 25px;
+    color: #566270;
+}
 
 /* Customize the label (the container) */
 .custom__radio {
